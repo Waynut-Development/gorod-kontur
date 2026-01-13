@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Городской Контур - Карта инициатив</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=a1b2c3d4-e5f6-7890-abcd-ef1234567890&lang=ru_RU" type="text/javascript"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-city"></i>
+                <h1>Городской Контур</h1>
+            </div>
+            <div class="user-info">
+                <span id="user-name">Гость</span>
+                <button id="login-btn" class="btn btn-secondary">Войти</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Левая панель: форма и список -->
+            <div class="sidebar">
+                <!-- Форма подачи идеи -->
+                <div class="card form-card">
+                    <h2><i class="fas fa-lightbulb"></i> Новая идея</h2>
+                    <form id="idea-form">
+                        <input type="text" id="title" placeholder="Краткое название" required>
+                        <textarea id="description" placeholder="Подробное описание..." rows="3" required></textarea>
+                        
+                        <div class="form-group">
+                            <label for="category"><i class="fas fa-tag"></i> Категория:</label>
+                            <select id="category">
+                                <option value="sport">🏀 Спорт</option>
+                                <option value="art">🎨 Искусство (муралы)</option>
+                                <option value="ecology">🌳 Экология</option>
+                                <option value="infrastructure">🛣 Инфраструктура</option>
+                                <option value="education">📚 Образование</option>
+                                <option value="culture">🎭 Культура</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address"><i class="fas fa-map-marker-alt"></i> Адрес:</label>
+                            <input type="text" id="address" placeholder="Начните вводить адрес...">
+                            <div id="address-suggestions" class="suggestions"></div>
+                        </div>
+
+                        <input type="file" id="photo" accept="image/*" style="display: none;">
+                        <button type="button" id="photo-btn" class="btn btn-secondary">
+                            <i class="fas fa-camera"></i> Добавить фото
+                        </button>
+                        <div id="photo-preview"></div>
+
+                        <div class="coords">
+                            <span>Координаты: <span id="coords">не указаны</span></span>
+                            <button type="button" id="get-location-btn" class="btn-small">
+                                <i class="fas fa-location-arrow"></i> Мое местоположение
+                            </button>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Отправить идею
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Список идей -->
+                <div class="card ideas-card">
+                    <h2><i class="fas fa-list"></i> Последние идеи</h2>
+                    <div class="filters">
+                        <select id="filter-category">
+                            <option value="all">Все категории</option>
+                            <option value="sport">Спорт</option>
+                            <option value="art">Искусство</option>
+                            <option value="ecology">Экология</option>
+                        </select>
+                        <select id="filter-priority">
+                            <option value="all">Все приоритеты</option>
+                            <option value="critical">Критический</option>
+                            <option value="high">Высокий</option>
+                            <option value="medium">Средний</option>
+                        </select>
+                    </div>
+                    <div id="ideas-list" class="ideas-list">
+                        <!-- Идеи будут загружаться здесь -->
+                        <div class="loading">Загрузка идей...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая часть: карта -->
+            <div class="map-container">
+                <div class="card map-card">
+                    <div class="map-header">
+                        <h2><i class="fas fa-map"></i> Интерактивная карта</h2>
+                        <div class="map-controls">
+                            <button id="heatmap-toggle" class="btn-small active">
+                                <i class="fas fa-fire"></i> Тепловая карта
+                            </button>
+                            <button id="cluster-toggle" class="btn-small">
+                                <i class="fas fa-layer-group"></i> Кластеры
+                            </button>
+                        </div>
+                    </div>
+                    <div id="map" style="height: 600px;"></div>
+                    <div class="map-legend">
+                        <div><span class="legend-color critical"></span> Критический</div>
+                        <div><span class="legend-color high"></span> Высокий</div>
+                        <div><span class="legend-color medium"></span> Средний</div>
+                        <div><span class="legend-color low"></span> Низкий</div>
+                    </div>
+                </div>
+
+                <!-- Статистика -->
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <h3><i class="fas fa-bullhorn"></i> Всего идей</h3>
+                        <div class="stat-number" id="total-ideas">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-fire"></i> Активных</h3>
+                        <div class="stat-number" id="active-ideas">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-check-circle"></i> Реализовано</h3>
+                        <div class="stat-number" id="completed-ideas">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-users"></i> Участников</h3>
+                        <div class="stat-number" id="total-users">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Футер -->
+        <footer class="footer">
+            <p>© 2024 Городской Контур. Фонд Андрея Мельниченко</p>
+            <div class="footer-links">
+                <a href="#"><i class="fab fa-telegram"></i> Telegram-бот</a>
+                <a href="/api/docs"><i class="fas fa-book"></i> API Документация</a>
+                <a href="#"><i class="fas fa-question-circle"></i> Помощь</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Модальное окно для входа -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Вход в систему</h2>
+            <form id="login-form">
+                <input type="email" placeholder="Email" required>
+                <input type="password" placeholder="Пароль" required>
+                <button type="submit" class="btn btn-primary">Войти</button>
+            </form>
+            <p class="modal-text">Или войдите через:</p>
+            <button class="btn btn-telegram">
+                <i class="fab fa-telegram"></i> Telegram
+            </button>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
