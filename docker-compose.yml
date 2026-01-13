@@ -17,49 +17,24 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     build: ./backend
     ports:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql://gorod:kontur2024@postgres:5432/gorod_kontur
-      REDIS_URL: redis://redis:6379/0
-      SECRET_KEY: your-super-secret-key-here-change-in-production
+      SECRET_KEY: dev-secret-key-change-in-production
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      MAPS_API_KEY: ${MAPS_API_KEY:-}
+      DEBUG: "True"
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
-        condition: service_healthy
     volumes:
       - ./backend:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    environment:
-      REACT_APP_API_URL: http://localhost:8000
-    depends_on:
-      - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    stdin_open: true
-    tty: true
+    command: >
+      sh -c "python -c 'from app.database import Base, engine; Base.metadata.create_all(bind=engine)' &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
 volumes:
   postgres_data:
-  redis_data:
