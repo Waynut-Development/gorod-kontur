@@ -6,15 +6,24 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://gorod:kontur2024@localhost:5432/gorod_kontur")
+# Для SQLite (рекомендуется для разработки)
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./gorod_kontur.db")
 
-engine = create_engine(DATABASE_URL)
+# ИЛИ для PostgreSQL (если установлен)
+# DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://gorod:kontur2024@localhost:5432/gorod_kontur")
+
+if DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(
+        DATABASE_URL, connect_args={"check_same_thread": False}
+    )
+else:
+    engine = create_engine(DATABASE_URL)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
 def get_db():
-    """Генератор сессий БД"""
     db = SessionLocal()
     try:
         yield db

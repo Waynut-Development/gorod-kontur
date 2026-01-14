@@ -1,8 +1,7 @@
-// Конфигурация
 const CONFIG = {
     API_URL: window.location.origin + '/api',
-    MAP_API_KEY: 'ВАШ_ЯНДЕКС_КЛЮЧ', // Замените на ваш ключ
-    DEFAULT_CENTER: [54.123456, 37.123456], // Координаты Киселёвска
+    MAP_API_KEY: '784034b0-cc45-44e6-b8bd-e3496cb837b7', // Ваш ключ
+    DEFAULT_CENTER: [54.001, 37.001], // Координаты Киселёвска
     DEFAULT_ZOOM: 12
 };
 

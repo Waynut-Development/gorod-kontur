@@ -76,7 +76,7 @@ class IdeaUpdate(BaseModel):
 # Vote schemas
 class VoteCreate(BaseModel):
     idea_id: uuid.UUID
-    vote_type: str = Field(..., regex="^(up|down)$")
+    vote_type: str = Field(..., pattern="^(up|down)$")
 
 class VoteResponse(BaseModel):
     id: uuid.UUID

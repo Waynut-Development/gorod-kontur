@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, Text, Boolean, ForeignKey, Enum, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from enum import Enum as PyEnum
 
@@ -27,7 +26,7 @@ class IdeaStatus(str, PyEnum):
 class User(Base):
     __tablename__ = "users"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = Column(String(255), unique=True, nullable=False, index=True)
     phone = Column(String(20))
     full_name = Column(String(255))
@@ -44,7 +43,7 @@ class User(Base):
 class Idea(Base):
     __tablename__ = "ideas"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     title = Column(String(500), nullable=False)
     description = Column(Text)
     category = Column(Enum(IdeaCategory), nullable=False, index=True)
@@ -56,7 +55,7 @@ class Idea(Base):
     address = Column(String(500))
     
     # Метаданные
-    author_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    author_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     votes_count = Column(Integer, default=0)
     comments_count = Column(Integer, default=0)
     duplicate_count = Column(Integer, default=0)
@@ -80,9 +79,9 @@ class Idea(Base):
 class Vote(Base):
     __tablename__ = "votes"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    idea_id = Column(UUID(as_uuid=True), ForeignKey("ideas.id"), nullable=False)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    idea_id = Column(String(36), ForeignKey("ideas.id"), nullable=False)
     vote_type = Column(String(10))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
@@ -92,9 +91,9 @@ class Vote(Base):
 class Comment(Base):
     __tablename__ = "comments"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    idea_id = Column(UUID(as_uuid=True), ForeignKey("ideas.id"), nullable=False)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    idea_id = Column(String(36), ForeignKey("ideas.id"), nullable=False)
     text = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
@@ -103,7 +102,7 @@ class Comment(Base):
 class InfrastructureObject(Base):
     __tablename__ = "infrastructure_objects"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     type = Column(String(100), nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)

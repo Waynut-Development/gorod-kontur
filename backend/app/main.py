@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 
 from .database import engine, Base
-from .api.endpoints import ideas, users, analytics, telegram
+from . import schemas, crud, services
 from .telegram_bot import init_bot
 
 # Загрузка переменных окружения
@@ -35,7 +35,8 @@ app.add_middleware(
 # Подключение статических файлов
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Подключение роутеров
+# Подключение роутеров напрямую
+from .api.endpoints import ideas, users, analytics, telegram
 app.include_router(ideas.router, prefix="/api", tags=["ideas"])
 app.include_router(users.router, prefix="/api", tags=["users"])
 app.include_router(analytics.router, prefix="/api", tags=["analytics"])
